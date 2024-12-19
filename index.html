@@ -93,6 +93,12 @@
         #edit-btn:hover, #remove-btn:hover {
             background-color: #0056b3;
         }
+        /* Timer styles */
+        #timer {
+            font-size: 20px;
+            color: red;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -103,6 +109,7 @@
     <div id="question">Click the button to get a random question!</div>
     <div id="answer">This is the answer!</div>
     <button id="reveal-btn" onclick="revealAnswer()">Reveal Answer</button>
+    <div id="timer">Time remaining: 30s</div>
 </div>
 
 <!-- Buttons to edit and remove question outside the question box -->
@@ -134,6 +141,8 @@
 
     let currentQuestion = {};
     let answerTimeout;
+    let countdownTimer;
+    let timeRemaining = 30;
 
     function getRandomQuestion() {
         const randomIndex = Math.floor(Math.random() * questions.length);
@@ -141,8 +150,23 @@
         document.getElementById('question').innerText = currentQuestion.question;
         document.getElementById('answer').style.display = 'none';
 
-        // Start the timer to reveal the answer after 30 seconds
+        // Start the countdown timer
+        timeRemaining = 30;
+        document.getElementById('timer').innerText = `Time remaining: ${timeRemaining}s`;
+
         clearTimeout(answerTimeout); // Clear any previous timer
+        clearInterval(countdownTimer); // Clear any previous countdown interval
+
+        countdownTimer = setInterval(function() {
+            timeRemaining--;
+            document.getElementById('timer').innerText = `Time remaining: ${timeRemaining}s`;
+            if (timeRemaining <= 0) {
+                clearInterval(countdownTimer);
+                revealAnswer();
+            }
+        }, 1000); // Update every second
+
+        // Start the reveal answer timer after 30 seconds
         answerTimeout = setTimeout(function() {
             revealAnswer();
         }, 30000); // 30 seconds = 30000 milliseconds
@@ -151,6 +175,7 @@
     function revealAnswer() {
         document.getElementById('answer').innerText = currentQuestion.answer;
         document.getElementById('answer').style.display = 'block';
+        clearInterval(countdownTimer); // Stop the countdown when the answer is revealed
     }
 
     function enableEdit() {
