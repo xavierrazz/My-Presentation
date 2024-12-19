@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Question Picker with Edit and Remove Feature</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f9;
+            padding: 20px;
+        }
+        .question-container {
+            padding: 20px;
+            border: 2px solid #ccc;
+            background-color: #fff;
+            margin-bottom: 20px;
+            width: 80%;
+            margin: auto;
+            border-radius: 8px;
+            position: relative;
+        }
+        #question {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        #answer {
+            font-size: 20px;
+            color: green;
+            display: none;
+            margin-top: 10px;
+        }
+        #reveal-btn {
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        #reveal-btn:hover {
+            background-color: #45a049;
+        }
+        #add-btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        #add-btn:hover {
+            background-color: #218838;
+        }
+        #new-question, #new-answer {
+            margin-top: 20px;
+            padding: 10px;
+            width: 60%;
+            font-size: 18px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        #save-new-btn {
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        #save-new-btn:hover {
+            background-color: #45a049;
+        }
+        /* Buttons outside of the question box */
+        .button-container {
+            margin-top: 20px;
+        }
+        #edit-btn, #remove-btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            margin: 0 10px;
+        }
+        #edit-btn:hover, #remove-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Random Question Picker</h1>
+
+<div class="question-container">
+    <div id="question">Click the button to get a random question!</div>
+    <div id="answer">This is the answer!</div>
+    <button id="reveal-btn" onclick="revealAnswer()">Reveal Answer</button>
+</div>
+
+<!-- Buttons to edit and remove question outside the question box -->
+<div class="button-container">
+    <button id="edit-btn" onclick="enableEdit()">Edit Question & Answer</button>
+    <button id="remove-btn" onclick="removeQuestion()">Remove Question & Answer</button>
+</div>
+
+<div class="question-container">
+    <button onclick="getRandomQuestion()">Get Random Question</button>
+</div>
+
+<!-- Add Question & Answer Section -->
+<div>
+    <button id="add-btn" onclick="enableAddNew()">Add New Question & Answer</button>
+    <textarea id="new-question" style="display: none;" placeholder="Enter a new question here..."></textarea>
+    <textarea id="new-answer" style="display: none;" placeholder="Enter the answer here..."></textarea>
+    <button id="save-new-btn" style="display: none;" onclick="saveNewQuestion()">Save New Question</button>
+</div>
+
+<script>
+    const questions = [
+        { question: "What is the capital of France?", answer: "Paris" },
+        { question: "What is 5 + 3?", answer: "8" },
+        { question: "What is the color of the sky?", answer: "Blue" },
+        { question: "Who wrote 'Hamlet'?", answer: "William Shakespeare" },
+        { question: "What is the largest planet in our solar system?", answer: "Jupiter" }
+    ];
+
+    let currentQuestion = {};
+    let answerTimeout;
+
+    function getRandomQuestion() {
+        const randomIndex = Math.floor(Math.random() * questions.length);
+        currentQuestion = questions[randomIndex];
+        document.getElementById('question').innerText = currentQuestion.question;
+        document.getElementById('answer').style.display = 'none';
+
+        // Start the timer to reveal the answer after 30 seconds
+        clearTimeout(answerTimeout); // Clear any previous timer
+        answerTimeout = setTimeout(function() {
+            revealAnswer();
+        }, 30000); // 30 seconds = 30000 milliseconds
+    }
+
+    function revealAnswer() {
+        document.getElementById('answer').innerText = currentQuestion.answer;
+        document.getElementById('answer').style.display = 'block';
+    }
+
+    function enableEdit() {
+        document.getElementById('new-question').style.display = 'block';
+        document.getElementById('new-answer').style.display = 'block';
+        document.getElementById('new-question').value = currentQuestion.question;
+        document.getElementById('new-answer').value = currentQuestion.answer;
+        document.getElementById('save-new-btn').style.display = 'inline-block';
+    }
+
+    function removeQuestion() {
+        const index = questions.findIndex(q => q.question === currentQuestion.question && q.answer === currentQuestion.answer);
+        if (index !== -1) {
+            questions.splice(index, 1);
+            alert("Question and answer removed!");
+            getRandomQuestion(); // Load a new random question
+        }
+    }
+
+    function enableAddNew() {
+        document.getElementById('new-question').style.display = 'block';
+        document.getElementById('new-answer').style.display = 'block';
+        document.getElementById('save-new-btn').style.display = 'inline-block';
+    }
+
+    function saveNewQuestion() {
+        const newQuestion = document.getElementById('new-question').value;
+        const newAnswer = document.getElementById('new-answer').value;
+
+        if (newQuestion.trim() !== "" && newAnswer.trim() !== "") {
+            questions.push({ question: newQuestion, answer: newAnswer });
+            alert("New question and answer added!");
+            document.getElementById('new-question').value = '';
+            document.getElementById('new-answer').value = '';
+            document.getElementById('new-question').style.display = 'none';
+            document.getElementById('new-answer').style.display = 'none';
+            document.getElementById('save-new-btn').style.display = 'none';
+        } else {
+            alert("Both question and answer are required.");
+        }
+    }
+
+    // Initialize with a random question
+    getRandomQuestion();
+</script>
+
+</body>
+</html>
